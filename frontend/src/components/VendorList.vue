@@ -56,20 +56,22 @@ const vendorStore = useVendorStore();
 const success = ref(false);
 const selectedVendor = ref<Vendor | null>(null);
 
-const dialogRef = ref(null);
+const dialogRef = ref<HTMLDialogElement | null>(null);
 
 onMounted(() => {
   vendorStore.fetchVendors();
 });
 
-const deleteVendor = (vendor) => {
+const deleteVendor = (vendor: Vendor) => {
   openDialog(vendor);
 };  
 
 const confirmDelete = async () => {
   if(vendorStore.loading) return;
   try {
-    await vendorStore.deleteVendor(selectedVendor.value?.id);
+    if (selectedVendor.value?.id !== undefined) {
+      await vendorStore.deleteVendor(selectedVendor.value.id);
+    }
     success.value = true;
     setTimeout(() => {
       success.value = false;
@@ -81,7 +83,7 @@ const confirmDelete = async () => {
   }
 }
 
-const openDialog = (vendor) => {
+const openDialog = (vendor: Vendor) => {
   selectedVendor.value = vendor;
   if (dialogRef.value) {
     dialogRef.value.showModal();

@@ -107,6 +107,7 @@ const submitForm = async () => {
 </script>
 
 <style scoped>
+
 .vendor-form {
   margin: 20px 0;
   padding: 20px;

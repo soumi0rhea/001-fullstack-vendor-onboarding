@@ -81,3 +81,33 @@ For coverage report:
 ```
 npm run test:coverage
 ```
+
+### 1. Frontend UI Polish
+-  Arrange the form and vendor list in a responsive layout that presents as a single column on mobile and a tidy multi-column layout on desktop using modern CSS (flexbox and/or grid).
+
+   - Added flexbox and media query as breakpoints to show responsive layout
+
+- Enhance the vendor list with hover/focus states, zebra striping, and an accessible empty state.
+
+  - Added aria labels and roles along side css hover and focus to enhance list structure
+
+- Introduce a lightweight design system by defining CSS variables (colours, spacing, typography) in `src/style.css` and apply them across components.
+- Add a small visual flourish such as a light/dark theme toggle (or similar motif) handled with CSS-first techniques.
+
+
+### 2. Delete vendor
+- Implement a delete functionality to allow users to remove vendor entries from the system
+- Include a confirmation dialog before deletion to prevent accidental removal.
+
+      - Created a delete function on the frontend which accepts vendor id as param and deletes the vendor
+      - Created a custom dialog box which on click of delete moves with the deletion whereas on cancel click closes the dialog. This prevents the accidental deletion.
+
+### 3. Fix the UI bug
+- Currently, clicking the "Add" button multiple times before the form resets can result in duplicate vendor entries.
+
+      - On add vendor, loading is set to true. While submitting duplicate record if the loading is already true prevent multiple click of add button
+
+### 4. Unique Emails
+- Ensure that vendor emails are unique across the system. If a user tries to register a vendor with a duplicate email, they should be informed of the conflict. 
+
+   - On Form submit, check-email api is called which validates whether the entered email already exists. If so further addition of the form data is prevented with an error message.If the email doesn't exists, vendor data is added and shown on the list. The api accepts email as encoded query param which is decoded on server side and run through db for existence.
