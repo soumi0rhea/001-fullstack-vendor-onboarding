@@ -147,8 +147,8 @@ describe('VendorForm', () => {
     // Mock checkEmailExists to return true (email exists)
     vi.mocked(store.checkEmailExists).mockResolvedValue(true);
     // Mock addVendor to set error state
-    vi.mocked(store.addVendor).mockRejectedValue(new Error('Email already exists'));
-    store.error = 'Email already exists';
+    vi.mocked(store.addVendor).mockRejectedValue(new Error('Email already exists. Please use a different email.'));
+    store.error = 'Email already exists. Please use a different email.';
 
     // Fill out the form with duplicate email
     await wrapper.find('#name').setValue('Another Company');
@@ -162,7 +162,7 @@ describe('VendorForm', () => {
     // Verify checkEmailExists was called
     expect(store.checkEmailExists).toHaveBeenCalledWith('john@testcompany.com');
     expect(wrapper.find('.error-message').exists()).toBe(true);
-    expect(wrapper.find('.error-message').text()).toBe('Email already exists');
+    expect(wrapper.find('.error-message').text()).toBe('Email already exists. Please use a different email.');
   });
 
 });
