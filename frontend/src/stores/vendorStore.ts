@@ -61,7 +61,8 @@ export const useVendorStore = defineStore('vendor', () => {
     error.value = null
 
     try {
-      return await VendorService.checkEmailExists(email)
+      const exists = await VendorService.checkEmailExists(email);
+      return exists
     } catch (err) {
       error.value = 'Failed to check email. Please try again later.'
       console.error(err)

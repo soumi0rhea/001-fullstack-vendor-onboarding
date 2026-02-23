@@ -2,7 +2,6 @@
   <div class="vendor-list">
     <h2>Vendor List</h2>
     <div v-if="vendorStore.loading">Loading vendors...</div>
-    <div v-else-if="vendorStore.error" class="error">{{ vendorStore.error }}</div>
     <div v-else-if="vendorStore.vendors.length === 0" class="no-vendors" role="status" aria-live="polite">
       <p class="no-vendors-title">No vendors found.</p>
       <p class="no-vendors-desc">Add your first vendor using the form.</p>
@@ -36,8 +35,16 @@
       </tbody>
     </table>
     <div v-if="success" class="success-message">Vendor deleted successfully!</div>
+    <div v-if="vendorStore.error" class="error">{{ vendorStore.error }}</div>
   </div>
+  <dialog ref="dialogRef" class="delete-dialog" aria-modal="true" role="dialog">
+    <h2 class="delete-dialog-title">Delete Vendor</h2>
+    <p class="delete-dialog-content">This action cannot be undone. Are you sure you want to delete <strong>{{ selectedVendor?.name }}</strong>?</p>
+    <button class="cancel-btn" @click="closeDialog">Cancel</button>
+    <button class="delete-confirm-btn" @click="confirmDelete">Delete</button>
+  </dialog>
 </template>
+
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
@@ -47,23 +54,46 @@ import type { Vendor } from '../types/Vendor';
 // Using the vendor store directly, no need for local props or state
 const vendorStore = useVendorStore();
 const success = ref(false);
+const selectedVendor = ref<Vendor | null>(null);
+
+const dialogRef = ref(null);
 
 onMounted(() => {
   vendorStore.fetchVendors();
 });
 
 const deleteVendor = (vendor) => {
-  if (confirm(`Are you sure you want to delete vendor "${vendor.name}"?`)) {
-    try {
-    vendorStore.deleteVendor(vendor.id);
+  openDialog(vendor);
+};  
+
+const confirmDelete = async () => {
+  if(vendorStore.loading) return;
+  try {
+    await vendorStore.deleteVendor(selectedVendor.value?.id);
     success.value = true;
     setTimeout(() => {
       success.value = false;
     }, 2000);
-  } catch (err) {}
-    
+  } catch (err) {
+    // Error is already handled in the store
+  } finally {
+    closeDialog();
   }
-};  
+}
+
+const openDialog = (vendor) => {
+  selectedVendor.value = vendor;
+  if (dialogRef.value) {
+    dialogRef.value.showModal();
+  }
+}
+
+const closeDialog = () => {
+  if (dialogRef.value) {
+    dialogRef.value.close();
+  }
+  selectedVendor.value = null;
+}
 
 </script>
 
@@ -137,5 +167,38 @@ const deleteVendor = (vendor) => {
 .success-message {
   color: #4CAF50;
   margin-top: 10px;
+}
+
+.delete-dialog {
+  border: none;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  margin: auto auto;
+}
+
+.delete-dialog::backdrop {
+  backdrop-filter: blur(5px);
+  background-color: rgba(0, 0, 0, 0.4);
+}
+
+.delete-dialog-title {
+  margin-top: 0;
+}
+.delete-dialog-content {
+  margin: 20px 0;
+}
+.cancel-btn {
+  padding: 10px 15px;
+  background-color: #ccc;
+  color: #333;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  margin-right: 10px;
+}
+.cancel-btn:hover {
+  background-color: #bbb;
 }
 </style>

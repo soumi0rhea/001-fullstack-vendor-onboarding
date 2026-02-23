@@ -85,7 +85,7 @@ const submitForm = async () => {
   if(vendorStore.loading) return;
 
   if(await vendorStore.checkEmailExists(form.email)) {
-    vendorStore.error = 'Email already exists';
+    vendorStore.error = 'Email already exists. Please use a different email.';
     return;
   }
 
