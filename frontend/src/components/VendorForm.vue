@@ -82,8 +82,15 @@ const resetForm = () => {
 };
 
 const submitForm = async () => {
+  if(vendorStore.loading) return;
+
+  if(await vendorStore.checkEmailExists(form.email)) {
+    vendorStore.error = 'Email already exists';
+    return;
+  }
+
   success.value = false;
-  
+
   try {
     await vendorStore.addVendor({ ...form });
     success.value = true;
@@ -101,12 +108,22 @@ const submitForm = async () => {
 
 <style scoped>
 .vendor-form {
-  max-width: 500px;
   margin: 20px 0;
   padding: 20px;
   border: 1px solid #ddd;
   border-radius: 8px;
   background-color: #f9f9f9;
+}
+
+@media (max-width: 1024px) {
+  .vendor-form {
+    width: 100%;
+  }
+}
+@media (min-width: 1024px) {
+ .vendor-form {
+   max-width: 500px;
+  }
 }
 
 .form-group {

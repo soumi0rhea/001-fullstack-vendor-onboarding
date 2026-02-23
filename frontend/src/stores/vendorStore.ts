@@ -11,7 +11,7 @@ export const useVendorStore = defineStore('vendor', () => {
   async function fetchVendors() {
     loading.value = true
     error.value = null
-    
+
     try {
       vendors.value = (await VendorService.getVendors()).reverse();
     } catch (err) {
@@ -25,7 +25,7 @@ export const useVendorStore = defineStore('vendor', () => {
   async function addVendor(vendor: Vendor) {
     loading.value = true
     error.value = null
-    
+
     try {
       await VendorService.createVendor(vendor)
       // Refresh the vendors list after adding a new vendor
@@ -39,11 +39,45 @@ export const useVendorStore = defineStore('vendor', () => {
     }
   }
 
+  async function deleteVendor(vendorId: number) {
+    loading.value = true
+    error.value = null
+
+    try {
+      await VendorService.deleteVendor(vendorId.toString())
+      // Refresh the vendors list after deleting a vendor
+      await fetchVendors()
+    } catch (err) {
+      error.value = 'Failed to delete vendor. Please try again later.'
+      console.error(err)
+      throw err
+    } finally {
+      loading.value = false
+    }
+  }
+
+  async function checkEmailExists(email: string) {
+    loading.value = true
+    error.value = null
+
+    try {
+      return await VendorService.checkEmailExists(email)
+    } catch (err) {
+      error.value = 'Failed to check email. Please try again later.'
+      console.error(err)
+      throw err
+    } finally {
+      loading.value = false
+    }
+  }
+
   return {
     vendors,
     loading,
     error,
     fetchVendors,
-    addVendor
+    addVendor,
+    deleteVendor,
+    checkEmailExists
   }
 })

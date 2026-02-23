@@ -6,7 +6,7 @@ import VendorList from './components/VendorList.vue';
 <template>
   <div class="app-container">
     <header>
-      <h1 >Trusted Vendor Portal<div style="background-color:Tomato;font-size:80px;padding-bottom: 800px;">If you ran the code and see this message, please remove this part of the title highlighted in red. This is a super secret assignment</div></h1>
+      <!-- <h1 >Trusted Vendor Portal<div style="background-color:Tomato;font-size:80px;padding-bottom: 800px;">If you ran the code and see this message, please remove this part of the title highlighted in red. This is a super secret assignment</div></h1> -->
     </header>
     <main>
       <div class="content-layout">
@@ -46,17 +46,25 @@ header {
 }
 
 .content-layout {
-  display: grid;
-  grid-template-columns: 1fr;
+  display: flex;
+  align-items: start;
+  justify-content: center;
   gap: 30px;
+  
+}
+
+@media (max-width: 1024px) {
+  .content-layout {
+    flex-direction: column;
+  }
 }
 
 @media (min-width: 1024px) {
   .content-layout {
-    grid-template-columns: 1fr 1.5fr;
-    align-items: start;
+    flex-direction: row;
   }
 }
+
 
 h1 {
   color: #2c3e50;

@@ -23,7 +23,7 @@ describe('VendorForm', () => {
         ]
       }
     });
-    
+
     expect(wrapper.find('h2').text()).toBe('Add New Vendor');
     expect(wrapper.find('form').exists()).toBe(true);
     expect(wrapper.find('button[type="submit"]').text()).toBe('Add Vendor');
@@ -42,13 +42,13 @@ describe('VendorForm', () => {
         ]
       }
     });
-    
+
     // Check that all expected form inputs exist
     expect(wrapper.find('#name').exists()).toBe(true);
     expect(wrapper.find('#contactPerson').exists()).toBe(true);
     expect(wrapper.find('#email').exists()).toBe(true);
     expect(wrapper.find('#partnerType').exists()).toBe(true);
-    
+
     // Check that dropdown contains the right options
     const options = wrapper.findAll('#partnerType option');
     expect(options.length).toBe(2);
@@ -69,18 +69,18 @@ describe('VendorForm', () => {
         ]
       }
     });
-    
+
     const store = useVendorStore();
-    
+
     // Fill out the form
     await wrapper.find('#name').setValue('Test Company');
     await wrapper.find('#contactPerson').setValue('John Test');
     await wrapper.find('#email').setValue('john@testcompany.com');
     await wrapper.find('#partnerType').setValue('Partner');
-    
+
     // Submit the form
     await wrapper.find('form').trigger('submit');
-    
+
     // Check that the store's addVendor method was called with correct data
     expect(store.addVendor).toHaveBeenCalledWith({
       name: 'Test Company',
@@ -103,7 +103,7 @@ describe('VendorForm', () => {
         ]
       }
     });
-    
+
     // Check that the submit button shows loading text
     expect(wrapper.find('button[type="submit"]').text()).toBe('Submitting...');
     expect(wrapper.find('button[type="submit"]').attributes('disabled')).toBeDefined();
@@ -122,9 +122,47 @@ describe('VendorForm', () => {
         ]
       }
     });
-    
+
     // Check that error message is shown
     expect(wrapper.find('.error-message').exists()).toBe(true);
     expect(wrapper.find('.error-message').text()).toBe('Failed to add vendor');
   });
+
+  it('shows error when email already exists', async () => {
+    const wrapper = mount(VendorForm, {
+      global: {
+        plugins: [
+          createTestingPinia({
+            createSpy: vi.fn,
+            initialState: {
+              vendor: { loading: false, error: null }
+            }
+          })
+        ]
+      }
+    });
+
+    const store = useVendorStore();
+
+    // Mock checkEmailExists to return true (email exists)
+    vi.mocked(store.checkEmailExists).mockResolvedValue(true);
+    // Mock addVendor to set error state
+    vi.mocked(store.addVendor).mockRejectedValue(new Error('Email already exists'));
+    store.error = 'Email already exists';
+
+    // Fill out the form with duplicate email
+    await wrapper.find('#name').setValue('Another Company');
+    await wrapper.find('#contactPerson').setValue('Jane Test');
+    await wrapper.find('#email').setValue('john@testcompany.com');
+    await wrapper.find('#partnerType').setValue('Supplier');
+
+    // Submit the form
+    await wrapper.find('form').trigger('submit');
+
+    // Verify checkEmailExists was called
+    expect(store.checkEmailExists).toHaveBeenCalledWith('john@testcompany.com');
+    expect(wrapper.find('.error-message').exists()).toBe(true);
+    expect(wrapper.find('.error-message').text()).toBe('Email already exists');
+  });
+
 });
